@@ -1,0 +1,56 @@
+server:
+  port: 8087
+  error:
+    include-message: always
+  servlet:
+    session:
+      cookie:
+        name: MYSESSIONID
+
+auth:
+  issuer-uri: http://127.0.0.1:${server.port}
+  jwks-uri: ${auth.issuer-uri}/oauth2/jwks
+  client-id: legacy-oauth-client
+  client-secret: secret
+  refresh-token-validity: 86400
+  access-token-validity: 43200
+  redirect-uri: https://127.0.0.1:8086/login/oauth2/code/custom
+
+application:
+  ldap:
+    groupSearchBase: ou=BOps,dc=testad,dc=local
+    groupSearchFilter: member={0}
+    ldapAttributeNames:
+      email: mail
+      firstName: sn
+      lastName: givenName
+    managerDn: uid=CoreRO,ou=Core,dc=testad,dc=local
+    managerPassword: 654321
+    templateId:
+      '[member of]': 41afabcc-0f6e-11ea-8d71-362b9e155667
+      BOps: 41afabcc-0f6e-11ea-8d71-362b9e155667
+      default: 41afb0e0-0f6e-11ea-8d71-362b9e155667 # OOB Guest template
+      '[domain computer]': 41afabcc-0f6e-11ea-8d71-362b9e155662
+    url: ldap://localhost:8389/
+    userSearchBase: ou=BOps,dc=testad,dc=local
+    userSearchFilter: (|(sAMAccountName={0})(uid={0})(cn={0}))
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  mvc:
+    log-request-details: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:8087
+  datasource:
+    #Postgre
+    url: jdbc:postgresql://localhost:5432/test_oauth
+    username: postgres
+    password: 654321
+    driverClassName: org.postgresql.Driver
+  jpa:
+    generate-ddl: true
